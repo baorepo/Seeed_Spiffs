@@ -38,15 +38,13 @@ extern "C" {
 using namespace fs;
 
 #ifdef ARDUINO
-extern "C" uint32_t _SPIFFS_start;
-extern "C" uint32_t _SPIFFS_end;
-extern "C" uint32_t _SPIFFS_page;
-extern "C" uint32_t _SPIFFS_block;
 
-#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
-#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
-#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
-#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
+#define SPIFFS_PHYS_ADDR (0)
+#define SPIFFS_PHYS_SIZE (32*1024*1024)
+#define SPIFFS_PHYS_PAGE (256)
+#define SPIFFS_PHYS_BLOCK (65536)
+
+
 #endif
 
 extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
@@ -314,7 +312,8 @@ protected:
 
     SPIFFSConfig _cfg;
 };
-
+//TODO
+#define panic(...) 
 #define CHECKFD() while (_fd == 0) { panic(); }
 
 class SPIFFSFileImpl : public FileImpl

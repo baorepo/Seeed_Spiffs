@@ -7,7 +7,7 @@
 //
 // This example code is in the public domain.
 
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 #include "FS.h"
 
 bool loadConfig() {
@@ -30,7 +30,7 @@ bool loadConfig() {
   // buffer to be mutable. If you don't use ArduinoJson, you may as well
   // use configFile.readString instead.
   configFile.readBytes(buf.get(), size);
-
+#if 0
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& json = jsonBuffer.parseObject(buf.get());
 
@@ -49,10 +49,12 @@ bool loadConfig() {
   Serial.println(serverName);
   Serial.print("Loaded accessToken: ");
   Serial.println(accessToken);
+#endif
   return true;
 }
 
 bool saveConfig() {
+#if 0
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
   json["serverName"] = "api.example.com";
@@ -65,6 +67,7 @@ bool saveConfig() {
   }
 
   json.printTo(configFile);
+#endif
   return true;
 }
 

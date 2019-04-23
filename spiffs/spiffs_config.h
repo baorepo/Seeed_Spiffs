@@ -11,7 +11,6 @@
 // ----------- 8< ------------
 // Following includes are for the linux test build of spiffs
 // These may/should/must be removed/altered/replaced in your target
-#include "params_test.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -86,7 +85,7 @@
 // for filedescriptor and cache buffers. Once decided for a configuration,
 // this can be disabled to reduce flash.
 #ifndef SPIFFS_BUFFER_HELP
-#define SPIFFS_BUFFER_HELP              0
+#define SPIFFS_BUFFER_HELP              1
 #endif
 
 // Enables/disable memory read caching of nucleus file system operations.
@@ -350,6 +349,14 @@
 #endif
 #endif
 
+// needed types
+typedef int32_t s32_t;
+typedef uint32_t u32_t;
+typedef int16_t s16_t;
+typedef uint16_t u16_t;
+typedef int8_t s8_t;
+typedef uint8_t u8_t;
+
 // Types depending on configuration such as the amount of flash bytes
 // given to spiffs file system in total (spiffs_file_system_size),
 // the logical block size (log_block_size), and the logical page size
@@ -369,5 +376,7 @@ typedef u16_t spiffs_obj_id;
 // hold the largest possible span index on the system -
 // i.e. (spiffs_file_system_size / log_page_size) - 1
 typedef u16_t spiffs_span_ix;
+
+
 
 #endif /* SPIFFS_CONFIG_H_ */
