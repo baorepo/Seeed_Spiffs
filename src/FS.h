@@ -21,8 +21,8 @@
 #ifndef FS_H
 #define FS_H
 
-#include <memory>
 #include <Arduino.h>
+#include <memory>
 
 namespace fs {
 
@@ -37,19 +37,14 @@ typedef std::shared_ptr<FSImpl> FSImplPtr;
 class DirImpl;
 typedef std::shared_ptr<DirImpl> DirImplPtr;
 
-template <typename Tfs>
-bool mount(Tfs& fs, const char* mountPoint);
+template <typename Tfs> bool mount(Tfs &fs, const char *mountPoint);
 
-enum SeekMode {
-    SeekSet = 0,
-    SeekCur = 1,
-    SeekEnd = 2
-};
+enum SeekMode { SeekSet = 0, SeekCur = 1, SeekEnd = 2 };
 
-class File : public Stream
-{
+class File : public Stream {
 public:
-    File(FileImplPtr p = FileImplPtr(), FS *baseFS = nullptr) : _p(p), _fakeDir(nullptr), _baseFS(baseFS) { }
+    File(FileImplPtr p = FileImplPtr(), FS *baseFS = nullptr) : _p(p), _fakeDir(nullptr), _baseFS(baseFS) {
+    }
 
     // Print methods:
     size_t write(uint8_t) override;
@@ -60,10 +55,10 @@ public:
     int read() override;
     int peek() override;
     void flush() override;
-    size_t readBytes(char *buffer, size_t length){
-        return read((uint8_t*)buffer, length);
+    size_t readBytes(char *buffer, size_t length) {
+        return read((uint8_t *)buffer, length);
     }
-    size_t read(uint8_t* buf, size_t size);
+    size_t read(uint8_t *buf, size_t size);
     bool seek(uint32_t pos, SeekMode mode);
     bool seek(uint32_t pos) {
         return seek(pos, SeekSet);
@@ -72,34 +67,34 @@ public:
     size_t size() const;
     void close();
     operator bool() const;
-    const char* name() const;
-    const char* fullName() const; // Includes path
+    const char *name() const;
+    const char *fullName() const; // Includes path
     bool truncate(uint32_t size);
 
     bool isFile() const;
     bool isDirectory() const;
 
     // Arduino "class SD" methods for compatibility
-    template<typename T> size_t write(T &src){
-      uint8_t obuf[256];
-      size_t doneLen = 0;
-      size_t sentLen;
-      int i;
+    template <typename T> size_t write(T &src) {
+        uint8_t obuf[256];
+        size_t doneLen = 0;
+        size_t sentLen;
+        int i;
 
-      while (src.available() > sizeof(obuf)){
-        src.read(obuf, sizeof(obuf));
-        sentLen = write(obuf, sizeof(obuf));
-        doneLen = doneLen + sentLen;
-        if(sentLen != sizeof(obuf)){
-          return doneLen;
+        while (src.available() > sizeof(obuf)) {
+            src.read(obuf, sizeof(obuf));
+            sentLen = write(obuf, sizeof(obuf));
+            doneLen = doneLen + sentLen;
+            if (sentLen != sizeof(obuf)) {
+                return doneLen;
+            }
         }
-      }
 
-      size_t leftLen = src.available();
-      src.read(obuf, leftLen);
-      sentLen = write(obuf, leftLen);
-      doneLen = doneLen + sentLen;
-      return doneLen;
+        size_t leftLen = src.available();
+        src.read(obuf, leftLen);
+        sentLen = write(obuf, leftLen);
+        doneLen = doneLen + sentLen;
+        return doneLen;
     }
     using Print::write;
 
@@ -113,14 +108,14 @@ protected:
 
     // Arduino SD class emulation
     std::shared_ptr<Dir> _fakeDir;
-    FS                  *_baseFS;
+    FS *_baseFS;
 };
 
 class Dir {
 public:
-    Dir(DirImplPtr impl = DirImplPtr(), FS *baseFS = nullptr): _impl(impl), _baseFS(baseFS) { }
+    Dir(DirImplPtr impl = DirImplPtr(), FS *baseFS = nullptr) : _impl(impl), _baseFS(baseFS) {}
 
-    File openFile(const char* mode);
+    File openFile(const char *mode);
 
     String fileName();
     size_t fileSize();
@@ -132,7 +127,7 @@ public:
 
 protected:
     DirImplPtr _impl;
-    FS       *_baseFS;
+    FS *_baseFS;
 };
 
 struct FSInfo {
@@ -144,12 +139,11 @@ struct FSInfo {
     size_t maxPathLength;
 };
 
-class FSConfig
-{
+class FSConfig {
 public:
     FSConfig(bool autoFormat = true) {
         _type = FSConfig::fsid::FSId;
-	_autoFormat = autoFormat;
+        _autoFormat = autoFormat;
     }
 
     enum fsid { FSId = 0x00000000 };
@@ -159,23 +153,21 @@ public:
     }
 
     uint32_t _type;
-    bool     _autoFormat;
+    bool _autoFormat;
 };
 
-class SPIFFSConfig : public FSConfig
-{
+class SPIFFSConfig : public FSConfig {
 public:
     SPIFFSConfig(bool autoFormat = true) {
         _type = SPIFFSConfig::fsid::FSId;
-	_autoFormat = autoFormat;
+        _autoFormat = autoFormat;
     }
     enum fsid { FSId = 0x53504946 };
 };
 
-class FS
-{
+class FS {
 public:
-    FS(FSImplPtr impl) : _impl(impl) { }
+    FS(FSImplPtr impl) : _impl(impl) {}
 
     bool setConfig(const FSConfig &cfg);
 
@@ -183,28 +175,28 @@ public:
     void end();
 
     bool format();
-    bool info(FSInfo& info);
+    bool info(FSInfo &info);
 
-    File open(const char* path, const char* mode);
-    File open(const String& path, const char* mode);
+    File open(const char *path, const char *mode);
+    File open(const String &path, const char *mode);
 
-    bool exists(const char* path);
-    bool exists(const String& path);
+    bool exists(const char *path);
+    bool exists(const String &path);
 
-    Dir openDir(const char* path);
-    Dir openDir(const String& path);
+    Dir openDir(const char *path);
+    Dir openDir(const String &path);
 
-    bool remove(const char* path);
-    bool remove(const String& path);
+    bool remove(const char *path);
+    bool remove(const String &path);
 
-    bool rename(const char* pathFrom, const char* pathTo);
-    bool rename(const String& pathFrom, const String& pathTo);
+    bool rename(const char *pathFrom, const char *pathTo);
+    bool rename(const String &pathFrom, const String &pathTo);
 
-    bool mkdir(const char* path);
-    bool mkdir(const String& path);
+    bool mkdir(const char *path);
+    bool mkdir(const String &path);
 
-    bool rmdir(const char* path);
-    bool rmdir(const String& path);
+    bool rmdir(const char *path);
+    bool rmdir(const String &path);
 
     bool gc();
 
@@ -215,19 +207,19 @@ protected:
 } // namespace fs
 
 #ifndef FS_NO_GLOBALS
-using fs::FS;
-using fs::File;
 using fs::Dir;
-using fs::SeekMode;
-using fs::SeekSet;
+using fs::File;
+using fs::FS;
+using fs::FSConfig;
+using fs::FSInfo;
 using fs::SeekCur;
 using fs::SeekEnd;
-using fs::FSInfo;
-using fs::FSConfig;
-#endif //FS_NO_GLOBALS
+using fs::SeekMode;
+using fs::SeekSet;
+#endif // FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
 extern fs::FS SPIFFS;
 #endif
 
-#endif //FS_H
+#endif // FS_H

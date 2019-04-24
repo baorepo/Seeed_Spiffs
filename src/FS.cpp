@@ -23,7 +23,7 @@
 
 using namespace fs;
 
-static bool sflags(const char* mode, OpenMode& om, AccessMode& am);
+static bool sflags(const char *mode, OpenMode &om, AccessMode &am);
 
 size_t File::write(uint8_t c) {
     if (!_p)
@@ -58,7 +58,7 @@ int File::read() {
     return result;
 }
 
-size_t File::read(uint8_t* buf, size_t size) {
+size_t File::read(uint8_t *buf, size_t size) {
     if (!_p)
         return -1;
 
@@ -121,14 +121,14 @@ bool File::truncate(uint32_t size) {
     return _p->truncate(size);
 }
 
-const char* File::name() const {
+const char *File::name() const {
     if (!_p)
         return nullptr;
 
     return _p->name();
 }
 
-const char* File::fullName() const {
+const char *File::fullName() const {
     if (!_p)
         return nullptr;
 
@@ -154,7 +154,7 @@ void File::rewindDirectory() {
         _fakeDir = std::make_shared<Dir>(_baseFS->openDir(fullName()));
     } else {
         _fakeDir->rewind();
-   }
+    }
 }
 
 File File::openNextFile() {
@@ -165,22 +165,20 @@ File File::openNextFile() {
     return _fakeDir->openFile("r");
 }
 
-String File::readString()
-{
+String File::readString() {
     String ret;
     ret.reserve(size() - position());
-    char temp[256+1];
-    int countRead = readBytes(temp, sizeof(temp)-1);
-    while (countRead > 0)
-    {
+    char temp[256 + 1];
+    int countRead = readBytes(temp, sizeof(temp) - 1);
+    while (countRead > 0) {
         temp[countRead] = 0;
         ret += temp;
-        countRead = readBytes(temp, sizeof(temp)-1);
+        countRead = readBytes(temp, sizeof(temp) - 1);
     }
     return ret;
 }
 
-File Dir::openFile(const char* mode) {
+File Dir::openFile(const char *mode) {
     if (!_impl) {
         return File();
     }
@@ -276,18 +274,18 @@ bool FS::format() {
     return _impl->format();
 }
 
-bool FS::info(FSInfo& info){
+bool FS::info(FSInfo &info) {
     if (!_impl) {
         return false;
     }
     return _impl->info(info);
 }
 
-File FS::open(const String& path, const char* mode) {
+File FS::open(const String &path, const char *mode) {
     return open(path.c_str(), mode);
 }
 
-File FS::open(const char* path, const char* mode) {
+File FS::open(const char *path, const char *mode) {
     if (!_impl) {
         return File();
     }
@@ -301,18 +299,18 @@ File FS::open(const char* path, const char* mode) {
     return File(_impl->open(path, om, am), this);
 }
 
-bool FS::exists(const char* path) {
+bool FS::exists(const char *path) {
     if (!_impl) {
         return false;
     }
     return _impl->exists(path);
 }
 
-bool FS::exists(const String& path) {
+bool FS::exists(const String &path) {
     return exists(path.c_str());
 }
 
-Dir FS::openDir(const char* path) {
+Dir FS::openDir(const char *path) {
     if (!_impl) {
         return Dir();
     }
@@ -320,113 +318,107 @@ Dir FS::openDir(const char* path) {
     return Dir(p, this);
 }
 
-Dir FS::openDir(const String& path) {
+Dir FS::openDir(const String &path) {
     return openDir(path.c_str());
 }
 
-bool FS::remove(const char* path) {
+bool FS::remove(const char *path) {
     if (!_impl) {
         return false;
     }
     return _impl->remove(path);
 }
 
-bool FS::remove(const String& path) {
+bool FS::remove(const String &path) {
     return remove(path.c_str());
 }
 
-bool FS::rmdir(const char* path) {
+bool FS::rmdir(const char *path) {
     if (!_impl) {
         return false;
     }
     return _impl->rmdir(path);
 }
 
-bool FS::rmdir(const String& path) {
+bool FS::rmdir(const String &path) {
     return rmdir(path.c_str());
 }
 
-bool FS::mkdir(const char* path) {
+bool FS::mkdir(const char *path) {
     if (!_impl) {
         return false;
     }
     return _impl->mkdir(path);
 }
 
-bool FS::mkdir(const String& path) {
+bool FS::mkdir(const String &path) {
     return mkdir(path.c_str());
 }
 
-bool FS::rename(const char* pathFrom, const char* pathTo) {
+bool FS::rename(const char *pathFrom, const char *pathTo) {
     if (!_impl) {
         return false;
     }
     return _impl->rename(pathFrom, pathTo);
 }
 
-bool FS::rename(const String& pathFrom, const String& pathTo) {
+bool FS::rename(const String &pathFrom, const String &pathTo) {
     return rename(pathFrom.c_str(), pathTo.c_str());
 }
 
-
-
-static bool sflags(const char* mode, OpenMode& om, AccessMode& am) {
+static bool sflags(const char *mode, OpenMode &om, AccessMode &am) {
     switch (mode[0]) {
-        case 'r':
-            am = AM_READ;
-            om = OM_DEFAULT;
-            break;
-        case 'w':
-            am = AM_WRITE;
-            om = (OpenMode) (OM_CREATE | OM_TRUNCATE);
-            break;
-        case 'a':
-            am = AM_WRITE;
-            om = (OpenMode) (OM_CREATE | OM_APPEND);
-            break;
-        default:
-            return false;
+    case 'r':
+        am = AM_READ;
+        om = OM_DEFAULT;
+        break;
+    case 'w':
+        am = AM_WRITE;
+        om = (OpenMode)(OM_CREATE | OM_TRUNCATE);
+        break;
+    case 'a':
+        am = AM_WRITE;
+        om = (OpenMode)(OM_CREATE | OM_APPEND);
+        break;
+    default:
+        return false;
     }
-    switch(mode[1]) {
-        case '+':
-            am = (AccessMode) (AM_WRITE | AM_READ);
-            break;
-        case 0:
-            break;
-        default:
-            return false;
+    switch (mode[1]) {
+    case '+':
+        am = (AccessMode)(AM_WRITE | AM_READ);
+        break;
+    case 0:
+        break;
+    default:
+        return false;
     }
     return true;
 }
-
 
 #if defined(FS_FREESTANDING_FUNCTIONS)
 
 /*
 TODO: move these functions to public API:
 */
-File open(const char* path, const char* mode);
-File open(String& path, const char* mode);
+File open(const char *path, const char *mode);
+File open(String &path, const char *mode);
 
-Dir openDir(const char* path);
-Dir openDir(String& path);
+Dir openDir(const char *path);
+Dir openDir(String &path);
 
-template<>
-bool mount<FS>(FS& fs, const char* mountPoint);
+template <> bool mount<FS>(FS &fs, const char *mountPoint);
 /*
-*/
-
+ */
 
 struct MountEntry {
     FSImplPtr fs;
-    String    path;
-    MountEntry* next;
+    String path;
+    MountEntry *next;
 };
 
-static MountEntry* s_mounted = nullptr;
+static MountEntry *s_mounted = nullptr;
 
-template<>
-bool mount<FS>(FS& fs, const char* mountPoint) {
+template <> bool mount<FS>(FS &fs, const char *mountPoint) {
     FSImplPtr p = fs._impl;
     if (!p || !p->mount()) {
         DEBUGV("FSImpl mount failed\r\n");
@@ -435,7 +427,8 @@ bool mount<FS>(FS& fs, const char* mountPoint) {
 
     !make sure mountPoint has trailing '/' here
 
-    MountEntry* entry = new MountEntry;
+            MountEntry *
+        entry = new MountEntry;
     entry->fs = p;
     entry->path = mountPoint;
     entry->next = s_mounted;
@@ -443,11 +436,10 @@ bool mount<FS>(FS& fs, const char* mountPoint) {
     return true;
 }
 
-
 /*
     iterate over MountEntries and look for the ones which match the path
 */
-File open(const char* path, const char* mode) {
+File open(const char *path, const char *mode) {
     OpenMode om;
     AccessMode am;
     if (!sflags(mode, om, am)) {
@@ -455,7 +447,7 @@ File open(const char* path, const char* mode) {
         return File();
     }
 
-    for (MountEntry* entry = s_mounted; entry; entry = entry->next) {
+    for (MountEntry *entry = s_mounted; entry; entry = entry->next) {
         size_t offset = entry->path.length();
         if (strstr(path, entry->path.c_str())) {
             File result = entry->fs->open(path + offset);
@@ -467,11 +459,11 @@ File open(const char* path, const char* mode) {
     return File();
 }
 
-File open(const String& path, const char* mode) {
+File open(const String &path, const char *mode) {
     return FS::open(path.c_str(), mode);
 }
 
-Dir openDir(const String& path) {
+Dir openDir(const String &path) {
     return openDir(path.c_str());
 }
 #endif

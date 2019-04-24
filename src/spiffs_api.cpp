@@ -25,8 +25,7 @@
 
 using namespace fs;
 
-FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
-{
+FileImplPtr SPIFFSImpl::open(const char *path, OpenMode openMode, AccessMode accessMode) {
     if (!isSpiffsFilenameValid(path)) {
         DEBUGV("SPIFFSImpl::open: invalid path=`%s` \r\n", path);
         return FileImplPtr();
@@ -34,26 +33,24 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
     int mode = getSpiffsMode(openMode, accessMode);
     int fd = SPIFFS_open(&_fs, path, mode, 0);
     if (fd < 0 && _fs.err_code == SPIFFS_ERR_DELETED && (openMode & OM_CREATE)) {
-        DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d, trying to remove\r\n",
-               fd, path, openMode, accessMode, _fs.err_code);
+        DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d, trying to remove\r\n", fd, path, openMode, accessMode,
+               _fs.err_code);
         auto rc = SPIFFS_remove(&_fs, path);
         if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFSImpl::open: SPIFFS_ERR_DELETED, but failed to remove path=`%s` openMode=%d accessMode=%d err=%d\r\n",
-                   path, openMode, accessMode, _fs.err_code);
+            DEBUGV("SPIFFSImpl::open: SPIFFS_ERR_DELETED, but failed to remove path=`%s` openMode=%d accessMode=%d err=%d\r\n", path, openMode,
+                   accessMode, _fs.err_code);
             return FileImplPtr();
         }
         fd = SPIFFS_open(&_fs, path, mode, 0);
     }
     if (fd < 0) {
-        DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
-               fd, path, openMode, accessMode, _fs.err_code);
+        DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n", fd, path, openMode, accessMode, _fs.err_code);
         return FileImplPtr();
     }
     return std::make_shared<SPIFFSFileImpl>(this, fd);
 }
 
-bool SPIFFSImpl::exists(const char* path)
-{
+bool SPIFFSImpl::exists(const char *path) {
     if (!isSpiffsFilenameValid(path)) {
         DEBUGV("SPIFFSImpl::exists: invalid path=`%s` \r\n", path);
         return false;
@@ -63,14 +60,13 @@ bool SPIFFSImpl::exists(const char* path)
     return rc == SPIFFS_OK;
 }
 
-DirImplPtr SPIFFSImpl::openDir(const char* path) 
-{
+DirImplPtr SPIFFSImpl::openDir(const char *path) {
     if (strlen(path) > 0 && !isSpiffsFilenameValid(path)) {
         DEBUGV("SPIFFSImpl::openDir: invalid path=`%s` \r\n", path);
         return DirImplPtr();
     }
     spiffs_DIR dir;
-    spiffs_DIR* result = SPIFFS_opendir(&_fs, path, &dir);
+    spiffs_DIR *result = SPIFFS_opendir(&_fs, path, &dir);
     if (!result) {
         DEBUGV("SPIFFSImpl::openDir: path=`%s` err=%d\r\n", path, _fs.err_code);
         return DirImplPtr();
@@ -78,8 +74,7 @@ DirImplPtr SPIFFSImpl::openDir(const char* path)
     return std::make_shared<SPIFFSDirImpl>(path, this, dir);
 }
 
-int getSpiffsMode(OpenMode openMode, AccessMode accessMode)
-{
+int getSpiffsMode(OpenMode openMode, AccessMode accessMode) {
     int mode = 0;
     if (openMode & OM_CREATE) {
         mode |= SPIFFS_CREAT;
@@ -99,8 +94,7 @@ int getSpiffsMode(OpenMode openMode, AccessMode accessMode)
     return mode;
 }
 
-bool isSpiffsFilenameValid(const char* name)
-{
+bool isSpiffsFilenameValid(const char *name) {
     if (name == nullptr) {
         return false;
     }
@@ -116,12 +110,7 @@ bool isSpiffsFilenameValid(const char* name)
 #endif
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
-FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
-                             SPIFFS_PHYS_ADDR,
-                             SPIFFS_PHYS_SIZE,
-                             SPIFFS_PHYS_PAGE,
-                             SPIFFS_PHYS_BLOCK,
-                             SPIFFS_MAX_OPEN_FILES)));
+FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(SPIFFS_PHYS_ADDR, SPIFFS_PHYS_SIZE, SPIFFS_PHYS_PAGE, SPIFFS_PHYS_BLOCK, SPIFFS_MAX_OPEN_FILES)));
 #endif // ARDUINO
 #endif // !CORE_MOCK
 
